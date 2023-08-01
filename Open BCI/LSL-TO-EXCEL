@@ -1,0 +1,78 @@
+Program that send to simulink and record excel (for testing UDP), continue to test from here
+
+from pylsl import StreamInlet, resolve_stream
+import csv
+import pandas as pd
+import socket
+import time
+import struct
+from datetime import datetime
+import ratelimit
+
+
+
+
+
+
+
+def main():
+
+    t = time.localtime(time.time())
+
+    localIP     = "127.0.0.1"
+
+    localPort   = 20001
+
+    UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM) # יצירת סוקט
+
+    UDPServerSocket.bind((localIP, localPort)) # מחברים את הסוקט לאייפי ופורט
+
+    test =('127.0.0.1',49004)
+
+    
+    msgFromServer=[]
+    arr=[]
+    arrTime= []
+    now = datetime.now()
+    arrcounter = []
+    
+    global counter 
+    counter = 1
+    # first resolve an EEG stream on the lab network
+    print("looking for an EEG stream...")
+    streams = resolve_stream('type', 'EEG')
+
+    # create a new inlet to read from the stream
+    inlet = StreamInlet(streams[0])
+  
+
+    while counter < 3700:
+        now = datetime.now()
+        date_time_str = now.strftime("%S.%f")
+        
+        # t = time.time()
+        time.sleep(0.008)
+        # ratelimit.rate_limited(0.008)
+        # get a new sample (you can also omit the timestamp part if you're not
+        # interested in it)
+        sample, timestamp = inlet.pull_sample()
+        print(sample[15])
+        msgFromServer = [sample[15],float(date_time_str),counter]
+        bytesToSend=struct.pack("3d",*msgFromServer)
+        UDPServerSocket.sendto(bytesToSend,test)
+
+        arr.append(sample[15])
+        arrcounter.append(counter)
+        arrTime.append(float(date_time_str))
+
+        counter = counter +1
+
+    df = pd.DataFrame([arr,arrTime,arrcounter])
+    df.to_csv('AlexTest5.csv',index=False)  
+
+
+if __name__ == '__main__':
+    
+
+    main()
+
