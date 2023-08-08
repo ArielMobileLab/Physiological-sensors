@@ -6,15 +6,18 @@ import csv
 import glob
 from sh import tail  # Import the tail utility from the sh library
 
-localIP = "0.0.0.0"
-localPort = 20001
+MatLabIP = "10.20.0.182"
+MatLabPort = 12355
+
+# localIP = "0.0.0.0"
+# localPort = 12345
 bufferSize = 2048
 
 # Create a datagram socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-# Bind to address and IP
-UDPServerSocket.bind((localIP, localPort))
+# # Bind to address and IP
+# UDPServerSocket.bind((localIP, localPort))
 
 
 def get_latest_eeg_data():
@@ -54,24 +57,33 @@ def extract_measurements(measurements_str):
     measurements = [int(value) if value.isdigit() else float(value) for value in values]
     return measurements
 
-def send_realtime_eeg_data(client_addr):
+def send_realtime_eeg_data():
     eeg_file_path = get_latest_eeg_data()
     for line in tail("-f", eeg_file_path, _iter=True):  # Use tail to continuously read new lines
         measurements_str = line.split('"')[3]  # Extract measurements from the line
         measurements = extract_measurements(measurements_str)
         selected_measurements = measurements[:12]  # Choose the first 12 values
         packed_data = struct.pack(f"{len(selected_measurements)}d", *selected_measurements)
-        print("Packed data:", packed_data)  # Print packed data for debugging
-        UDPServerSocket.sendto(packed_data, client_addr)
+        print("Packed data:", selected_measurements)  # Print packed data for debugging
+        UDPServerSocket.sendto(packed_data, (MatLabIP,MatLabPort))
 
+
+# def main():
+#     print("Server is running. Waiting for clients...")
+#     while True:
+#         bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+#         client_address = bytesAddressPair[1]
+#         print(f"Connected to client: {client_address}")
+#         send_realtime_eeg_data(client_address)
 
 def main():
     print("Server is running. Waiting for clients...")
     while True:
-        bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-        client_address = bytesAddressPair[1]
-        print(f"Connected to client: {client_address}")
-        send_realtime_eeg_data(client_address)
+        # bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+        # client_address = bytesAddressPair[1]
+        # print(f"Connected to client: {client_address}")
+        send_realtime_eeg_data()
+
 
 if __name__ == "__main__":
     main()
