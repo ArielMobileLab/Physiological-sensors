@@ -1,6 +1,6 @@
 #   Brain Space Real-time EEG Data Server
 
-This Python script sets up a real-time EEG data server that receives and sends EEG data over UDP (User Datagram Protocol). It continuously monitors a specified data folder for new EEG files and streams the data to connected clients.
+This Python script sets up a real-time EEG data server that receives EEG data From Brain Space interface and sends EEG data over UDP (User Datagram Protocol) to Moblie lab Interface. It continuously monitors a specified data folder for new EEG files and streams the data to connected clients.
 
 ## Features
 
