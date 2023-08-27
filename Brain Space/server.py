@@ -62,7 +62,8 @@ def send_realtime_eeg_data():
     for line in tail("-f", eeg_file_path, _iter=True):  # Use tail to continuously read new lines
         measurements_str = line.split('"')[3]  # Extract measurements from the line
         measurements = extract_measurements(measurements_str)
-        selected_measurements = measurements[:12]  # Choose the first 12 values
+        # Channels The similar to G.tec Chnnels
+        selected_measurements = measurements[73],measurements[49],measurements[77],measurements[68],measurements[66],measurements[60],measurements[60],measurements[51],measurements[97],measurements[25],measurements[90],measurements[10]  
         packed_data = struct.pack(f"{len(selected_measurements)}d", *selected_measurements)
         print("Packed data:", selected_measurements)  # Print packed data for debugging
         UDPServerSocket.sendto(packed_data, (MatLabIP,MatLabPort))
