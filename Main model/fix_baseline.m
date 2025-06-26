@@ -2,26 +2,28 @@ clear;
 clc;
 
 
+
 %Heart rate Mean and sd calculation
 valHR = load('HeartRate.mat', 'heartRatedata');
 sm = cell2mat(table2array(cell2table(struct2cell(valHR))));
-sm_one_line =sm(2,:);
+sm_one_line =sm(2,10:end);
 sm_one_line_without_zero = nonzeros(sm_one_line');
 sm_one_line_reshape_without_zero = flipud(sm_one_line_without_zero);
 sm_one_line_reshape_without_zero = sm_one_line_reshape_without_zero(sm_one_line_reshape_without_zero >= 40 );
 sm_one_line_reshape_without_zero = sm_one_line_reshape_without_zero(sm_one_line_reshape_without_zero <= 150 );
 % precentile90_Baseline = prctile(sm_one_line_reshape_without_zero(:,1), 90);
-MEAN_HR_Baseline = mean(sm_one_line_reshape_without_zero(:,1));
-meanHR_2_Baseline = mean(sm_one_line_reshape_without_zero(:,1).^2);
+sm_one_line_reshape_without_zero_and_duplicate = unique(sm_one_line_reshape_without_zero);
+MEAN_HR_Baseline = mean(sm_one_line_reshape_without_zero_and_duplicate(:,1));
+meanHR_2_Baseline = mean(sm_one_line_reshape_without_zero_and_duplicate(:,1).^2);
 % median_Baseline = prctile(sm_one_line_reshape_without_zero(:,1), 50);
-SD_HR_Baseline = std(sm_one_line_reshape_without_zero(:,1));
+SD_HR_Baseline = std(sm_one_line_reshape_without_zero_and_duplicate(:,1));
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 %EEG Alpha/Beta Mean and sd calculation
 Va1Ratio = load('Ratio.mat','Ratio');
 smRatio = cell2mat(table2array(cell2table(struct2cell(Va1Ratio))));
-sm_one_line_Ratio =smRatio(2,10:end);
+sm_one_line_Ratio =smRatio(2,12:end);
 % sm_one_line_Ratio =smRatio(2,6:end);
 sm_one_line_Ratio_without_zero = sm_one_line_Ratio';
 sm_one_line_Ratio_reshape_without_zero = flipud(sm_one_line_Ratio_without_zero);
@@ -71,6 +73,9 @@ date = string(X);
 
 load('Baseline.mat', 'Baselinedata')
 
+% Assuming your matrix is named 'myMatrix'
+% Display only the first two columns of the matrix
+
 % Make Cell in row #16 for date varible and put that in new B1 matrix that include the Data verible and Baseline data.
 B1=zeros(size(Baselinedata,1)+1,size(Baselinedata,2));
 B1(1:15,1:end)=Baselinedata;
@@ -78,7 +83,7 @@ B1(16,1)=date;
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % Plugin the user ID.
-Participant_ID='x';
+Participant_ID='C2_133227';
 
 headersBaseline=[
     "measurement time" %1
@@ -104,9 +109,9 @@ BASE=[headersBaseline';B1'];
 
 foldername = sprintf('Baseline Data of %s',Participant_ID);
 
- direc = [ 'C:\Users\LAB-OREN3\Desktop\CognataData\Participants_DATA\' Participant_ID '\Physiological\' foldername '\'];
- mkdir([ 'C:\Users\LAB-OREN3\Desktop\CognataData\Participants_DATA\' Participant_ID '\Physiological\']);
- mkdir([ 'C:\Users\LAB-OREN3\Desktop\CognataData\Participants_DATA\' Participant_ID '\Physiological\' foldername '\']);
+ direc = [ 'C:\Users\LAB-OREN3\Desktop\Data\Participants_DATA\' Participant_ID '\Physiological\' foldername '\'];
+ mkdir([ 'C:\Users\LAB-OREN3\Desktop\Data\Participants_DATA\' Participant_ID '\Physiological\']);
+ mkdir([ 'C:\Users\LAB-OREN3\Desktop\Data\Participants_DATA\' Participant_ID '\Physiological\' foldername '\']);
  
  filename3 = sprintf('%s.xlsx',foldername);
  
